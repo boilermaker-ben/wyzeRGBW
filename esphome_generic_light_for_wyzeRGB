@@ -1,0 +1,113 @@
+substitutions:
+  # https://esphome.io/guides/configuration-types.html#substitutions
+  device_name: bulb_wyze_color
+
+esphome:
+  # https://esphome.io/components/esphome
+  name: ${device_name}
+  platform: ESP32
+  board: esp32doit-devkit-v1
+  on_boot: # Turns on light to a specified color temperature after boot, rather than restoring to undesired white value
+    priority: 700.0
+    then:
+      - light.turn_on: 
+          id: ${device_name}_light
+          color_temperature: 3200 K
+          # transition_length: "1.2s"
+
+captive_portal:
+  # https://esphome.io/components/captive_portal.html
+
+api:
+  # https://esphome.io/components/api
+  
+ota:
+  # https://esphome.io/components/ota
+  
+web_server:
+  port: 80
+  # https://esphome.io/components/web_server.html
+
+time:
+  # https://esphome.io/components/time.html
+  - platform: homeassistant
+    id: homeassistant_time
+
+text_sensor:
+  # https://esphome.io/components/text_sensor/custom.html
+  - platform: version
+    # https://esphome.io/components/text_sensor/version.html
+    name: ${device_name}_esphome_ver
+  - platform: wifi_info
+    # https://esphome.io/components/text_sensor/wifi_info.html
+    ip_address:
+      name: ${device_name}_IP
+    ssid:
+      name: ${device_name}_SSID
+    bssid:
+      name: ${device_name}_BSSID
+
+wifi:
+  # https://esphome.io/components/wifi
+  ssid: !secret iot_ssid
+  password: !secret iot_pass
+
+  ap:
+    ssid: ${device_name}_node
+    password: "password"
+    manual_ip:
+      static_ip: !secret wifi_ap_ip
+      gateway: !secret wifi_ap_gateway
+      subnet: !secret wifi_ap_subnet
+      dns1: !secret wifi_ap_dns1
+      dns2: !secret wifi_ap_dns2
+
+logger:
+  baud_rate: 0
+  # https://esphome.io/components/logger
+      
+output:
+  - platform: ledc
+    # https://esphome.io/components/output/ledc.html
+    id: output_red
+    pin: GPIO14
+    frequency: 1220Hz
+    power_supply: rgb_power
+    # max_power: 0.85
+  - platform: ledc
+    # https://esphome.io/components/output/ledc.html
+    id: output_green
+    pin: GPIO26
+    frequency: 1220Hz
+    power_supply: rgb_power
+    # max_power: 0.85
+  - platform: ledc
+    # https://esphome.io/components/output/ledc.html
+    id: output_blue
+    pin: GPIO13
+    frequency: 1220Hz
+    power_supply: rgb_power
+    # max_power: 0.80
+  - platform: ledc
+    # https://esphome.io/components/output/ledc.html  
+    id: output_white  
+    pin: GPIO15
+    frequency: 1220Hz
+    # power_supply: rgb_power
+    # max_power: 0.80
+
+power_supply:
+  # https://esphome.io/components/power_supply.html
+  - id: rgb_power
+    pin: GPIO23
+
+light:
+  # https://esphome.io/components/light/index.html
+  - platform: rgbw
+    id: ${device_name}_light
+    name: ${device_name}_light
+    red: output_red
+    green: output_green
+    blue: output_blue
+    white: output_white
+    restore_mode: ALWAYS_OFF    
