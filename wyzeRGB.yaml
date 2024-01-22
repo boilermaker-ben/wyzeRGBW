@@ -5,67 +5,32 @@ substitutions:
 esphome:
   # https://esphome.io/components/esphome
   name: ${device_name}
-  platform: ESP32
-  board: esp32doit-devkit-v1
-  on_boot: # Turns on light to a specified color temperature after boot, rather than restoring to undesired white value
+  includes:
+    - custom_components/wyzeRGBW/wyzeRGBW.h
+  on_boot:
     priority: 700.0
     then:
       - light.turn_on: 
-          id: ${device_name}_light
+          id: ${device_name}
           color_temperature: 3200 K
-          # transition_length: "1.2s"
 
-captive_portal:
-  # https://esphome.io/components/captive_portal.html
+esp32:
+  # https://esphome.io/components/esp32
+  board: esp32doit-devkit-v1
+  framework:
+    type: esp-idf
 
-api:
-  # https://esphome.io/components/api
+# Other required or optional ESPHome components here, like the BLE tracker and proxy below...
   
-ota:
-  # https://esphome.io/components/ota
-  
-web_server:
-  port: 80
-  # https://esphome.io/components/web_server.html
+esp32_ble_tracker:
+  # https://esphome.io/components/esp32_ble_tracker.html
+  scan_parameters:
+    active: true
 
-time:
-  # https://esphome.io/components/time.html
-  - platform: homeassistant
-    id: homeassistant_time
+bluetooth_proxy:
+  # https://esphome.io/components/bluetooth_proxy.html
+  active: true
 
-text_sensor:
-  # https://esphome.io/components/text_sensor/custom.html
-  - platform: version
-    # https://esphome.io/components/text_sensor/version.html
-    name: ${device_name}_esphome_ver
-  - platform: wifi_info
-    # https://esphome.io/components/text_sensor/wifi_info.html
-    ip_address:
-      name: ${device_name}_IP
-    ssid:
-      name: ${device_name}_SSID
-    bssid:
-      name: ${device_name}_BSSID
-
-wifi:
-  # https://esphome.io/components/wifi
-  ssid: !secret iot_ssid
-  password: !secret iot_pass
-
-  ap:
-    ssid: ${device_name}_node
-    password: "password"
-    manual_ip:
-      static_ip: !secret wifi_ap_ip
-      gateway: !secret wifi_ap_gateway
-      subnet: !secret wifi_ap_subnet
-      dns1: !secret wifi_ap_dns1
-      dns2: !secret wifi_ap_dns2
-
-logger:
-  baud_rate: 0
-  # https://esphome.io/components/logger
-      
 output:
   - platform: ledc
     # https://esphome.io/components/output/ledc.html
@@ -104,13 +69,14 @@ power_supply:
 light:
   # https://esphome.io/components/light/index.html
   - platform: wyzeRGBW
-    id: ${device_name}_light
-    name: ${device_name}_light
-    cold_white_color_temperature: "6666.6666 K" # 150 Mired
-    warm_white_color_temperature: "2500 K" # 
+    id: ${device_name}
+    name: ${device_name}
+    cold_white_color_temperature: !secret bulb_wyze_rgb_cold
+    warm_white_color_temperature: !secret bulb_wyze_rgb_warm
     red: output_red
     green: output_green
     blue: output_blue
     white: output_white
     restore_mode: ALWAYS_OFF
-    default_transition_length: 0s
+    # default_transition_length: 0.5s
+    # effects: .....
