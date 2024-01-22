@@ -69,28 +69,25 @@ class wyzeRGBW : public light::LightOutput, public Component {
           }
           
           if (mode_ == tunable) {
-              // Place the rgb values on three lines
-              r = std::min(std::max((scalar_r * xaxis + offset_r) * brightness, 0.0f), 1.0f);
-              g = std::min(std::max((scalar_g * xaxis + offset_g) * brightness, 0.0f), 1.0f);
-              b = std::min(std::max((scalar_b * xaxis + offset_b) * brightness, 0.0f), 1.0f);
-              w = std::min(std::max((scalar_w * xaxis + offset_w) * brightness, 0.0f), 1.0f);
+            // Place the rgb values on three lines
+            r = std::min(std::max((scalar_r * xaxis + offset_r) * brightness, 0.0f), 1.0f);
+            g = std::min(std::max((scalar_g * xaxis + offset_g) * brightness, 0.0f), 1.0f);
+            b = std::min(std::max((scalar_b * xaxis + offset_b) * brightness, 0.0f), 1.0f);
+            w = std::min(std::max((scalar_w * xaxis + offset_w) * brightness, 0.0f), 1.0f);
+          } else {
+            w = 0.0f;
           }
           
           // Output to set actual levels of light
           this->output_r_->set_level(r);
           this->output_g_->set_level(g);
           this->output_b_->set_level(b);
-          if (mode_ == rgb) {
-            this->output_w_->set_level(0.0f);
-          } else {
-            this->output_w_->set_level(w);
-          }
-          
+          this->output_w_->set_level(w);
+
           // Store these values
           this->previous_r = r;
           this->previous_g = g;
           this->previous_b = b;
-          this->previous_w = w;
           this->oldMode_ = mode_;
           this->previous_temperature = temperature;
           this->previous_brightness = brightness;
