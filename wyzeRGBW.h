@@ -5,10 +5,11 @@
 #include "esphome/components/output/float_output.h"
 #include "esphome/components/light/light_output.h"
 #include "esphome/components/ledc/ledc_output.h"
-enum mode {rgb, tunable};
 
 namespace esphome {
 namespace wyzeRGBW {
+
+enum mode {rgb, tunable};
 
 class wyzeRGBW : public light::LightOutput, public Component {
   public:
