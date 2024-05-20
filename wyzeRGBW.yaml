@@ -71,8 +71,9 @@ light:
   - platform: wyzeRGBW
     id: ${device_name}
     name: ${device_name}
-    cold_white_color_temperature: !secret bulb_wyze_rgb_cold
-    warm_white_color_temperature: !secret bulb_wyze_rgb_warm
+    cold_white_color_temperature: "7000 K"
+    warm_white_color_temperature: "2700 K"
+    # I personally use 6666.6K and 2500k to base automations on 150-400 mired values, but 7000/2700k are the listed numbers from Wyze
     red: output_red
     green: output_green
     blue: output_blue
