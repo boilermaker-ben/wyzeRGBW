@@ -1,0 +1,207 @@
+substitutions:
+  device_name: ENTER_YOUR_DEVICE_NAME_HERE
+  device_description: ENTER_YOUR_DEVICE_DESCRIPTION_HERE (for instance: Wyze RGBW Bulb)
+  cold: 7000k # modify as needed
+  warm: 2500k # modify as needed
+
+esphome:
+  name: ${device_name}
+  comment: ${device_description}
+  # Include this if you want the bulb to turn on at a certain temperature
+  on_boot:
+    priority: 700.0
+    then:
+      - light.turn_on:
+          id: ${device_name}
+          color_temperature: 3200 K
+
+# Ensure aligns with your device, this configuration works for the older Wyze RGBW Bulbs
+esp32:
+  board: esp32doit-devkit-v1
+  framework:
+    type: esp-idf
+
+# Place the "tunableRGBW.h", "light.py", "__init__.py" files all within the ESPHome directory in "custom_components/tunableRGBW/"
+external_components:
+  - source:
+      type: local
+      path: custom_components
+
+wifi:
+  ssid: !secret iot_ssid
+  password: !secret iot_pass
+    
+  ap:
+    ssid: node
+    password: "password"
+    manual_ip:
+      static_ip: !secret wifi_ap_ip
+      gateway: !secret wifi_ap_gateway
+      subnet: !secret wifi_ap_subnet
+      dns1: !secret wifi_ap_dns1
+      dns2: !secret wifi_ap_dns2
+  
+logger:
+  baud_rate: 0
+  
+captive_portal:
+
+api:
+  
+mdns:
+  
+ota:
+  platform: esphome
+  
+web_server:
+  port: 80
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+text_sensor:
+  - platform: version
+    name: ${device_name}_esphome_ver
+  - platform: wifi_info
+    ip_address:
+      name: ${device_name}_IP
+    ssid:
+      name: ${device_name}_SSID
+    bssid:
+      name: ${device_name}_BSSID
+
+# These entries for "number" input can be removed and their values added to the "light" component below if you've found numbers that you prefer for these settings. Exposed to HA by default to allow for adjustment without re-compiling.
+number:
+  - platform: template
+    id: mix_warm_red
+    name: ${device_name}_mix_warm_red
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 100
+    optimistic: true
+  - platform: template
+    id: mix_warm_green
+    name: ${device_name}_mix_warm_green
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 35
+    optimistic: true
+  - platform: template
+    id: mix_warm_blue
+    name: ${device_name}_mix_warm_blue
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 0
+    optimistic: true
+  - platform: template
+    id: mix_warm_white
+    name: ${device_name}_mix_warm_white
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 20
+    optimistic: true
+  - platform: template
+    id: mix_cool_red
+    name: ${device_name}_mix_cool_red
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 0
+    optimistic: true
+  - platform: template
+    id: mix_cool_green
+    name: ${device_name}_mix_cool_green
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 50
+    optimistic: true
+  - platform: template
+    id: mix_cool_blue
+    name: ${device_name}_mix_cool_blue
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 100
+    optimistic: true
+  - platform: template
+    id: mix_cool_white
+    name: ${device_name}_mix_cool_white
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 80
+    optimistic: true
+  - platform: template
+    id: mix_white_brightness
+    name: ${device_name}_mix_white_brightness
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 85
+    optimistic: true
+
+# You can comment out or adjust the power levels for each output here. To avoid overheating and ruining the Wyze Bulb, I have these reduced from 100%
+output:
+  - platform: ledc
+    id: output_red
+    pin: GPIO14
+    frequency: 1220Hz
+    power_supply: rgb_power
+    max_power: 0.90
+  - platform: ledc
+    id: output_green
+    pin: GPIO26
+    frequency: 1220Hz
+    power_supply: rgb_power
+    max_power: 0.80
+  - platform: ledc
+    id: output_blue
+    pin: GPIO13
+    frequency: 1220Hz
+    power_supply: rgb_power
+    max_power: 0.80
+  - platform: ledc
+    id: output_white  
+    pin: GPIO15
+    frequency: 1220Hz
+    max_power: 0.85
+
+power_supply:
+  - id: rgb_power
+    pin: GPIO23
+
+light:
+  - platform: tunableRGBW
+    id: ${device_name}
+    name: ${device_name}
+    cold_white_color_temperature: ${cold}
+    warm_white_color_temperature: ${warm}
+    red: output_red
+    green: output_green
+    blue: output_blue
+    white: output_white
+    gamma_correct: 2.2
+    minimum_color_brightness: 0.2
+    minimum_tunable_brightness: 0.05
+    color_temperature_boost: 2.0
+    warm_white_mix:
+      red: mix_warm_red
+      green: mix_warm_green
+      blue: mix_warm_blue
+      white: mix_warm_white
+    cool_white_mix:
+      red: mix_cool_red
+      green: mix_cool_green
+      blue: mix_cool_blue
+      white: mix_cool_white
+    white_brightness: mix_white_brightness
+    restore_mode: ALWAYS_OFF
+    default_transition_length: 0.5s
+    # Add some fun light effects below
+    # effects: ...
