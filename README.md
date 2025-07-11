@@ -1,24 +1,28 @@
-# wyzeRGBW
-Wyze Bulb Color (RGBW) Tunable Custom Component for use with ESPHome
+# tunableRGBW
+A newly-developed generic implementation of color temperature ability added to any bulb that is RGBW for integration with ESPHome. This code allows for the fine tuning of red and blue mixing with the white output to emulate a colore temperature bulb.
 
-I've used these bulbs with Tasmota for a while, but prefer ESPHome and the customization options that seem more intuitive with ESPHome. 
-
-Here's a link to the Tasmota template and bulb reference: 
-https://templates.blakadder.com/wyze_WLPA19C.html
+Formerly, this was developed exclusively for the older Wyze Bulb Color (RGBW, WLPA19C). Here's a link to the Tasmota template and bulb reference: https://templates.blakadder.com/wyze_WLPA19C.html
 
 Instructions for using this component:
 
 - Make a folder for "custom_components" alongside your ESPHome files
-  - https://esphome.io/custom/custom_component.html (these are being deprecated and I'll have to adjust in the future for an "external component")
-  - In my case, running within Docker, I have a "custom_components" folder that's in the same directory as the "bulb_wyze_color" directory
-- Copy "__init__.py", "light.py", and "wyzeRGBW.h" into that directory
-- Include the text from the "wyzeRGBW.yaml" in your ESPHome config for the light
+  - https://esphome.io/custom/custom_component.html (I know there's a push to go to "external_components")
+  - In my case, running within Docker, I have a "custom_components" folder nested alongside all my applicable device folders
+- Copy "__init__.py", "light.py", and "tunableRGBW.h" into that directory
+- Include the text from the "tunableRGBW.yaml" in your ESPHome config for the light
 - Add any other custom components and light effects in your YAML
 - Flash the light
-  - Keep in mind, the esp-idf framework that makes BLE tracking more efficient requires a non-OTA flash to reformat the partition
 - Enjoy a tunable white feature running ESPHome on a cool ESP32 enabled LED bulb!
 
-  
+Key improvements over old "wyzeRGBW" implementation:
+
+- Allows for dynamic adjustment of color mix via sliders exposed to HA (R, G, B, W for both warm and cool)
+- Ensures that the brightness of the color output doesn't drop so low as to be non-visible (adjustable with "minimum_color_brightness" in YAML)
+- Ensures that the brightness of the tunable white output doesn't drop so low as to be non-visible (adjustable with "minimum_tunable_brightness" in YAML)
+- Allows for a color_temperature_boost feature to ensure that as the light dims, the red and blue aren't lost in color mixing
+- Attempts to smooth dimming in a way that keeps the light looking warmer or cooler as the brightness diminishes
+
+
 From what I can tell, these projects helped inform the way I created this code (along with some sanity checking from ChatGPT):
 
 https://gist.github.com/madjam002/31cc88640efa370630fed6914fa4eb7f
