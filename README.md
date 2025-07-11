@@ -2,6 +2,9 @@
 
 CHECK OUT THE NEW "tunableRGBW" BRANCH for an update to this that's more versatile! (Updated July 2025)
 
+
+Old version readme below:
+
 Wyze Bulb Color (RGBW) Tunable Custom Component for use with ESPHome
 
 I've used these bulbs with Tasmota for a while, but prefer ESPHome and the customization options that seem more intuitive with ESPHome. 
